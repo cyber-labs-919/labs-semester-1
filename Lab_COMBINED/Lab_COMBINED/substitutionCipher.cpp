@@ -1,11 +1,17 @@
-// Lab_SubstitutionCipher.cpp : This file contains the 'main' function. Program execution begins and ends there.
-//
-
 #include <iostream>
 #include <string>
+#include "substitutionCipher.h"
+
 using namespace std;
 
-string encrypt(string inp, string keyFrom, string keyTo) {
+string SubstitutionCipherCrypto::encrypt(string inp, map_type options) {
+    if (!options.count("keyTo") || !options.count("keyFrom")) {
+        throw std::runtime_error("Substitution cipher requires options keyTo and keyFrom.");
+    }
+
+    string keyTo = options["keyTo"];
+    string keyFrom = options["keyFrom"];
+
     if (keyFrom.length() != keyTo.length()) {
         throw std::runtime_error("keyFrom and keyTo must have an equal length.");
     }
@@ -19,7 +25,7 @@ string encrypt(string inp, string keyFrom, string keyTo) {
             if (secPos != string::npos) {
                 warned = true;
                 cout << "Warning: character " << c << " in the plaintext is in keyTo, but not in keyFrom. The ciphertext will not be possible to accurately reverse into plaintext, " <<
-                    "because " << c << " will remain the same in the ciphertext, and during decryption we won't be able to determine if it was initially " << c << 
+                    "because " << c << " will remain the same in the ciphertext, and during decryption we won't be able to determine if it was initially " << c <<
                     ", or if it was " << keyFrom[secPos] << " and was encrypted into " << c << "." << endl;
             }
             encrypted += c;
@@ -31,21 +37,20 @@ string encrypt(string inp, string keyFrom, string keyTo) {
     return encrypted;
 }
 
-void test(string inp, string keyFrom, string keyTo) {
-    string encrypted = encrypt(inp, keyFrom, keyTo);
-    string decrypted = encrypt(encrypted, keyTo, keyFrom);
+string SubstitutionCipherCrypto::decrypt(std::string inp, map_type options)
+{
+    if (!options.count("keyTo") || !options.count("keyFrom")) {
+        throw std::runtime_error("Substitution cipher requires options keyTo and keyFrom.");
+    }
+
+    return encrypt(inp, { {"keyFrom", options["keyTo"]}, {"keyTo", options["keyFrom"]} });
+}
+
+void SubstitutionCipherCrypto::test(string inp, map_type options) {
+    string encrypted = encrypt(inp, options);
+    string decrypted = decrypt(encrypted, options);
     cout << "Input:     " << inp << endl;
     cout << "Encrypted: " << encrypted << endl;
     cout << "Decrypted: " << decrypted << endl;
     cout << "Success:   " << (inp == decrypted ? "true" : "false (reason explained in the warning)") << endl;
-}
-
-int main()
-{
-    test("test123", "es2", "fra");
-    cout << endl;
-    test("hello, world", "abcdefgh", "qwextyui"); // sa chi ashxati vortev sxal tipi key-enq tvel, avelin kbacatrvi warningum
-    cout << endl;
-    test("this is a test message", "abcdef", "fedcba");
-    cout << endl;
 }
