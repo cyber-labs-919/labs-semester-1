@@ -4,7 +4,7 @@
 
 class SubstitutionCipherCrypto : public Crypto {
 public:
-    std::string encrypt(std::string inp, map_type options) override;
-    std::string decrypt(std::string inp, map_type options) override;
-    void test(std::string inp, map_type options) override;
+    virtual std::string encrypt(std::string inp, map_type options);
+    virtual std::string decrypt(std::string inp, map_type options);
+    virtual void test(std::string inp, map_type options);
 };
